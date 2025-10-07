@@ -1,0 +1,81 @@
+package com.dishcovery.backend.service;
+
+
+import com.dishcovery.backend.dto.LoginDto;
+import com.dishcovery.backend.model.Users;
+import com.dishcovery.backend.repo.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Service
+public class UserServicesImp {
+
+    @Autowired
+    private UserRepo userRepo;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+
+
+
+    public Map<String, String> registerUser(Users user) {
+        Map<String, String>  message = new HashMap<>();
+        if(!usernameExists(user.getUsername())) {
+            message.put("message", "username alredy taken");
+            message.put("status", "400");
+            return message;
+        }
+
+        if(!emailExists(user.getEmail())) {
+            message.put("message", "Email alredy taken");
+            message.put("status", "400");
+            return message;
+        }
+        user.setEnabled(false);
+        user.setProfilePicture(DEFAULT_PROFILE_IMAGE);
+        user.setRole("USER");
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepo.save(user);
+        message.put("message", "user registered successfully");
+        message.put("status", "200");
+        return message;
+    }
+
+    //check if username already exists
+    private boolean usernameExists(String username) {
+        Users userPresent = userRepo.findByUsername(username);
+        if(userPresent == null) {
+            return true;
+        }
+        return false;
+    }
+
+    //check if email already exists
+    private boolean emailExists(String email) {
+        Users userPresent = userRepo.findByEmail(email);
+        if(userPresent == null) {
+            return true;
+        }
+        return false;
+    }
+
+    public String loginUser(LoginDto userDto) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
+        if(authentication.isAuthenticated()) {
+            return "login success";
+        }
+        return "login fail";
+    }
+}
