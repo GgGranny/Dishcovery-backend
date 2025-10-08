@@ -4,13 +4,12 @@ package com.dishcovery.backend.controller;
 import com.dishcovery.backend.dto.LoginDto;
 import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.response.ResponseHandler;
+import com.dishcovery.backend.service.TokenService;
 import com.dishcovery.backend.service.UserServicesImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,6 +18,9 @@ public class UserController {
 
     @Autowired
     private UserServicesImp userServicesImp;
+
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody Users user) {
@@ -32,9 +34,15 @@ public class UserController {
 
     @PostMapping("/login")
     public String loginUser(@RequestBody LoginDto userDto) {
-        System.out.println("hello login");
-        return userServicesImp.loginUser(userDto);
+        System.out.println("hello login" + userDto.toString());
+        return userServicesImp.verify(userDto);
     }
 
+
+    @GetMapping("/register/verify-email/{token}")
+    public String confirmToken(@PathVariable("token") String token) {
+        tokenService.validate(token);
+        return "success";
+    }
 
 }
