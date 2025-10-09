@@ -3,7 +3,7 @@ package com.dishcovery.backend.controller;
 
 import com.dishcovery.backend.dto.LoginDto;
 import com.dishcovery.backend.model.Users;
-import com.dishcovery.backend.response.ResponseHandler;
+import com.dishcovery.backend.response.MyResponseHandler;
 import com.dishcovery.backend.service.TokenService;
 import com.dishcovery.backend.service.UserServicesImp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +26,14 @@ public class UserController {
     public ResponseEntity<Object> registerUser(@RequestBody Users user) {
         Map<String, String> msg = userServicesImp.registerUser(user);
         if(msg.get("status").equals("400")) {
-            return ResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, msg.get("message"), null);
+            return MyResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, msg.get("message"), null);
         }
-        return  ResponseHandler.responseBuilder(HttpStatus.CREATED, msg.get("message"), user);
+        return  MyResponseHandler.responseBuilder(HttpStatus.CREATED, msg.get("message"), user);
     }
 
 
     @PostMapping("/login")
-    public String loginUser(@RequestBody LoginDto userDto) {
-        System.out.println("hello login" + userDto.toString());
+    public ResponseEntity<?> loginUser(@RequestBody LoginDto userDto) {
         return userServicesImp.verify(userDto);
     }
 

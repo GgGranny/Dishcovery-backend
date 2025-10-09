@@ -23,7 +23,7 @@ public class MailService {
             String messageBody = """
                     Thank you for the sign up !
                    \s
-                      `http://localhost:8080/register/verify-email?token=%s`            \s
+                      your OPT- %s      \s
                        \s
                    \s""".formatted(token);
             message.setText(messageBody);

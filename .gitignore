@@ -11,8 +11,6 @@ target/
 .project
 .settings
 .springBeans
-.sts4-cache
-.src/main/resources/application-local.properties
 
 ### IntelliJ IDEA ###
 .idea
@@ -21,6 +19,7 @@ target/
 *.ipr
 
 ### NetBeans ###
+/src/main/resources/application-local.properties
 /nbproject/private/
 /nbbuild/
 /dist/

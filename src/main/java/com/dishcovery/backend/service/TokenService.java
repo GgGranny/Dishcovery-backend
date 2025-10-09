@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class TokenService {
@@ -34,12 +35,12 @@ public class TokenService {
                 .orElseThrow(() -> new IllegalArgumentException("Token not found"));
 
         // check if the token is confirmed
-        if(tokenConfirmed.getConfirmAt()== null) {
+        if(tokenConfirmed.getConfirmAt() != null) {
             throw new IllegalArgumentException("Token is already confirmed");
         }
 
         // check if the token is expired
-        LocalDateTime expireDateTime = tokenConfirmed.getConfirmAt();
+        LocalDateTime expireDateTime = tokenConfirmed.getExpiresAt();
         if(expireDateTime.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Token is expired");
         }
@@ -55,5 +56,11 @@ public class TokenService {
     private void enableUser(Users user) {
         user.setEnabled(true);
         userRepo.save(user);
+    }
+
+    public String generateToken() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
     }
 }
