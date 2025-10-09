@@ -19,7 +19,6 @@ target/
 *.ipr
 
 ### NetBeans ###
-/src/main/resources/application-local.properties
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -31,3 +30,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### local application.properties
+src/main/resources/application-local.properties
