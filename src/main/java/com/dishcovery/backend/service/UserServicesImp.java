@@ -2,8 +2,10 @@ package com.dishcovery.backend.service;
 
 
 import com.dishcovery.backend.dto.LoginDto;
+import com.dishcovery.backend.dto.UserDto;
 import com.dishcovery.backend.model.Token;
 import com.dishcovery.backend.model.Users;
+import com.dishcovery.backend.repo.TokenRepo;
 import com.dishcovery.backend.repo.UserRepo;
 import com.dishcovery.backend.response.MyResponseHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,7 @@ public class UserServicesImp {
     private TokenService tokenService;
 
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+    private TokenRepo tokenRepo;
 
     public Map<String, String> registerUser(Users user) {
         Map<String, String>  message = new HashMap<>();
@@ -92,11 +95,62 @@ public class UserServicesImp {
         try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
             if(authentication.isAuthenticated()) {
-                return MyResponseHandler.responseBuilder(HttpStatus.OK, "Login Successful", null);
+                Users user = userRepo.findByUsername(userDto.getUsername());
+                UserDto responseUser = new UserDto(user.getId(), user.getUsername(),user.getEmail(), user.getProfilePicture(),user.getRole(), user.getEnabled());
+                return MyResponseHandler.responseBuilder(HttpStatus.OK, "Login Successful", responseUser);
             }
             return MyResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Login Failed", null);
         }catch(Exception e) {
             return MyResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Please verify your email", null);
         }
+    }
+
+    public ResponseEntity<Object> verifyEmailAndSendOTP(String email) {
+        try {
+            Users user = userRepo.findByEmail(email);
+            if(user == null) {
+                throw new IllegalArgumentException("No such user found");
+            }
+
+            //Generate OTP token and save it
+            Token token = new Token(user,tokenService.generateToken(), LocalDateTime.now().plusMinutes(2), LocalDateTime.now());
+            tokenService.saveToken(token);
+
+            // send otp to recover change password
+            Map<String, String> msg =new HashMap<>();
+            msg.put("expires_at", "2min");
+            mailService.sendMail(user.getEmail(), token.getToken());
+            return MyResponseHandler.responseBuilder(HttpStatus.OK, "An OTP is sent to your Email", msg);
+        }catch(Exception e) {
+            throw new IllegalArgumentException("Please verify your email", e);
+        }
+    }
+
+    public boolean updateUserPassword(String token, String newPassword) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        //check if the token exists
+        Token tokenOpt = tokenService.getTokenByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Token not found"));
+
+        // check if the token is expired
+        LocalDateTime expireTime = tokenOpt.getExpiresAt();
+        if(expireTime.isBefore(LocalDateTime.now())){
+            throw new IllegalArgumentException("Token is expired");
+        }
+
+        //check if token is confirmed and if not confirm it
+        if(tokenOpt.getConfirmAt() != null) {
+            throw new IllegalArgumentException("Token is already confirmed");
+        }
+
+        // update users new password
+        Users user = tokenOpt.getUser();
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userRepo.save(user);
+
+        response.put("status", HttpStatus.OK);
+        return true;
     }
 }

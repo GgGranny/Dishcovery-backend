@@ -36,6 +36,15 @@ public class SecurityConfig {
 //                .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session  -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .logout(logout-> logout
+                        .logoutUrl("/user/logout")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .logoutSuccessHandler(((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("Logout success fully");
+                        }))
+                )
                 .build();
     }
 
