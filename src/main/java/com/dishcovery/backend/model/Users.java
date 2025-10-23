@@ -2,6 +2,9 @@ package com.dishcovery.backend.model;
 
 
 import jakarta.persistence.*;
+import org.hibernate.action.internal.OrphanRemovalAction;
+
+import java.util.List;
 
 @Entity
 public class Users {
@@ -26,6 +29,9 @@ public class Users {
 
     @Column(name="enabled")
     private boolean enabled;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Video> videos;
 
     public Users() {
     }
@@ -95,6 +101,18 @@ public class Users {
         this.enabled = enabled;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
+    }
+
     @Override
     public String toString() {
         return "Users{" +
@@ -104,7 +122,8 @@ public class Users {
                 ", email='" + email + '\'' +
                 ", profilePicture='" + profilePicture + '\'' +
                 ", role='" + role + '\'' +
-                ", enabled='" + enabled + '\'' +
+                ", enabled=" + enabled +
+                ", videos=" + videos +
                 '}';
     }
 }
