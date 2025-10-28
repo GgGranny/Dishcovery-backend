@@ -6,6 +6,8 @@ import com.dishcovery.backend.model.Video;
 import com.dishcovery.backend.response.MyResponseHandler;
 import com.dishcovery.backend.service.VideoServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +30,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("api/v1/videos")
 public class VideoController {
+
+    private static final int CHUNK_SIZE = 1024 * 1024;
 
     @Autowired
     private VideoServiceImplementation videoServiceImplementation;
@@ -96,13 +101,16 @@ public class VideoController {
 
         System.out.println(range);
         String[] ranges = range.replace("bytes=","").split("-");
-        System.out.println("ranges: " + ranges.toString());
+
         startRange = Long.parseLong(ranges[0]);
-        if(ranges.length > 1) {
-            endRange = Long.parseLong(ranges[1]);
-        }else {
-            endRange = fileLength - 1;
-        }
+
+        endRange = startRange + CHUNK_SIZE -1;
+
+//        if(ranges.length > 1) {
+//            endRange = Long.parseLong(ranges[1]);
+//        }else {
+//            endRange = fileLength - 1;
+//        }
 
         if(endRange > fileLength -1) {
             endRange = fileLength -1;
@@ -122,16 +130,67 @@ public class VideoController {
             headers.add("Content-Length", String.valueOf(contentLength));
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 
+            byte[] data = new byte[(int) contentLength];
+            int read = inputStream.read(data, 0 , data.length);
 
 
             return ResponseEntity
                     .status(HttpStatus.PARTIAL_CONTENT)
                     .contentType(MediaType.parseMediaType(contentType))
                     .headers(headers)
-                    .body(new InputStreamResource(inputStream));
+                    .body(new ByteArrayResource(data));
+//                    .body(new InputStreamResource(inputStream));
 
         }catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+
+    @Value("${file.hls_videos}")
+    private String HLS_DIR;
+
+    @GetMapping("/stream/segment/{videoId}/master.m3u8")
+    public ResponseEntity<Resource> streamVideoSegment(@PathVariable("videoId") String videoId) {
+
+        try {
+        Path path = Paths.get(HLS_DIR, videoId, "master.m3u8");
+
+        Resource resource = new FileSystemResource(path);
+
+        if(!resource.exists()) {
+            throw new FileNotFoundException("No master file found");
+        }
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_TYPE,"application/vnd.apple.mpegurl")
+                .body(resource);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @GetMapping("/stream/segment/{videoId}/{segment}.ts")
+    public ResponseEntity<Resource> getVideoSegment(@PathVariable("videoId") String videoId, @PathVariable("segment") String segment) {
+
+        try {
+            Path path = Paths.get(HLS_DIR, videoId, segment +".ts");
+
+            Resource resource = new FileSystemResource(path);
+            if(!resource.exists()) {
+                throw new RuntimeException("No segment file found");
+            }
+
+            return ResponseEntity
+                    .ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
+                    .body(resource);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
