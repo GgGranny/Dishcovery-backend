@@ -35,3 +35,4 @@ build/
 ### local application.properties
 src/main/resources/application-local.properties
 videos/
+videosHLS/
