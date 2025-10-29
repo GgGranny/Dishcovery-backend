@@ -8,8 +8,6 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +36,9 @@ public class VideoServiceImplementation implements VideoService {
     @Value("${files.video}")
     private String DIR;
 
+    @Value("${file.hls_videos}")
+    private String HLS_DIR;
+
     public VideoServiceImplementation(UserRepo userRepo, VideoRepo videoRepo) {
         this.userRepo = userRepo;
         this.videoRepo = videoRepo;
@@ -47,6 +48,10 @@ public class VideoServiceImplementation implements VideoService {
     public void init() {
         try {
             File file = new File(DIR);
+            File file1 = new File(HLS_DIR);
+
+            if(!file1.exists()) Files.createDirectory(Paths.get(HLS_DIR));
+
             if(!file.exists()) {
                 file.mkdir();
             }
@@ -93,6 +98,9 @@ public class VideoServiceImplementation implements VideoService {
                 // save the file in dir
                 Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
 
+                ///  transcribe the video
+                transcribeVideo(video.getVideoId());
+
                 logger.info("Video Uploaded Successfully");
                 return video;
             }
@@ -114,6 +122,45 @@ public class VideoServiceImplementation implements VideoService {
             throw new RuntimeException("Video not found");
         }
         return optVideo.get();
+    }
+
+
+    /// Video Processing or Segmentation
+    @Override
+    public String transcribeVideo(String videoId) {
+
+        Optional<Video> videoOpt = videoRepo.findByVideoId(videoId);
+        if(videoOpt.isEmpty()) {
+            throw new RuntimeException("Video not found");
+        }
+        Video video = videoOpt.get();
+
+        try {
+            String inputPath = video.getPath();
+
+            Path outputPath = Paths.get(HLS_DIR, video.getVideoId());
+            File file = new File(outputPath.toString());
+            if(!file.exists()) {
+                Files.createDirectory(outputPath);
+            }
+
+            String ffmpegCmd = String
+                    .format("ffmpeg -i \"%s\" -c:a aac -c:v libx264 -strict -2 -f hls -hls_time 10 -hls_list_size 0 -hls_segment_filename \"%s/segment_%%3d.ts\" \"%s/master.m3u8\"",inputPath,outputPath.toString(), outputPath.toString());
+
+            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe","/c", ffmpegCmd);
+            processBuilder.inheritIO();
+            Process process = processBuilder.start();
+
+            int wait = process.waitFor();
+            if (wait != 0) {
+                throw new RuntimeException("Video Transcription Failed");
+            }
+
+        }catch(Exception e) {
+            logger.error("file not found", e);
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
