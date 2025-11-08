@@ -25,7 +25,6 @@ public class Video {
 
     private LocalDateTime uploadedAt;
 
-
     @ManyToOne
     @JoinColumn(name="user_id")
     @JsonIgnore

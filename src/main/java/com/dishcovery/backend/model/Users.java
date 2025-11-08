@@ -33,16 +33,28 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Video> videos;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Recipe> recipe;
+
     public Users() {
     }
 
-    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled) {
+    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled, List<Recipe> recipe) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.profilePicture = profilePicture;
         this.role = role;
         this.enabled = enabled;
+        this.recipe =recipe;
+    }
+
+    public List<Recipe> getRecipe() {
+        return recipe;
+    }
+
+    public void setRecipe(List<Recipe> recipe) {
+        this.recipe = recipe;
     }
 
     public int getId() {
@@ -123,7 +135,6 @@ public class Users {
                 ", profilePicture='" + profilePicture + '\'' +
                 ", role='" + role + '\'' +
                 ", enabled=" + enabled +
-                ", videos=" + videos +
                 '}';
     }
 }

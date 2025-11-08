@@ -91,7 +91,7 @@ public class VideoServiceImplementation implements VideoService {
                     video.setContentType("video/mp4");
                 }
                 video.setUploadedAt(LocalDateTime.now());
-                videoRepo.save(video);
+                Video video1 = videoRepo.save(video);
 
                 // save the file in dir
                 Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
@@ -101,7 +101,7 @@ public class VideoServiceImplementation implements VideoService {
                 transcribeVideoInMultipleQuality(video.getVideoId());
 
                 logger.info("Video Uploaded Successfully");
-                return video;
+                return video1;
             }
         }catch(Exception e) {
             logger.info("Video upload error", e);
