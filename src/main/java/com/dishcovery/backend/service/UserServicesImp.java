@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,9 @@ public class UserServicesImp {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private JWTService jwtService;
 
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     private TokenRepo tokenRepo;
@@ -92,18 +96,26 @@ public class UserServicesImp {
     }
 
     public ResponseEntity<Object> verify(LoginDto userDto) {
-        try{
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword()));
-            if(authentication.isAuthenticated()) {
-                Users user = userRepo.findByUsername(userDto.getUsername());
-                UserDto responseUser = new UserDto(user.getId(), user.getUsername(),user.getEmail(), user.getProfilePicture(),user.getRole(), user.getEnabled());
-                return MyResponseHandler.responseBuilder(HttpStatus.OK, "Login Successful", responseUser);
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword())
+            );
+
+            if (authentication.isAuthenticated()) {
+                String token = jwtService.generateToken(userDto.getUsername());
+                return ResponseEntity.ok(token);
             }
-            return MyResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Login Failed", null);
-        }catch(Exception e) {
-            return MyResponseHandler.responseBuilder(HttpStatus.BAD_REQUEST, "Please verify your email", null);
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
     }
+
 
     public ResponseEntity<Object> verifyEmailAndSendOTP(String email) {
         try {
