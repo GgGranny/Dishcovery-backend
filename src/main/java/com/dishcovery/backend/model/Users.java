@@ -36,6 +36,9 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recipe> recipe;
 
+//    @OneToMany(mappedBy = "", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Likes> likes;
+
     public Users() {
     }
 

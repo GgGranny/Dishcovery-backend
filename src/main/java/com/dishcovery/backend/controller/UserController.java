@@ -1,13 +1,13 @@
 package com.dishcovery.backend.controller;
 
 
+import com.dishcovery.backend.components.UserSession;
 import com.dishcovery.backend.dto.ForgotPasswordDto;
 import com.dishcovery.backend.dto.LoginDto;
 import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.response.MyResponseHandler;
 import com.dishcovery.backend.service.TokenService;
 import com.dishcovery.backend.service.UserServicesImp;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,9 @@ public class UserController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private UserSession userSession;
+
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody Users user) {
         Map<String, String> msg = userServicesImp.registerUser(user);
@@ -36,7 +39,12 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginDto userDto) {
-        return userServicesImp.verify(userDto);
+        Map<String, String> tokens = userServicesImp.verify(userDto);
+        if(!tokens.isEmpty()){
+            tokens.put("message", "Login Successful");
+            return ResponseEntity.ok().body(tokens);
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("login Failed");
     }
 
 
@@ -65,10 +73,9 @@ public class UserController {
     }
 
 
-//    @GetMapping("/user/logout")
-//    public ResponseEntity<?> logoutUser(HttpSession session) {
-//        session.invalidate();
-//        return MyResponseHandler.responseBuilder(HttpStatus.OK, "user logged out successfully", null);
-//    }
+    @GetMapping("/user")
+    public ResponseEntity<Object> getUser() {
+        return ResponseEntity.ok().body(userSession.getUser());
+    }
 
 }

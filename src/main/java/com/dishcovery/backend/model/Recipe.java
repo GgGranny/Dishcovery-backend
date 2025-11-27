@@ -23,6 +23,8 @@ public class Recipe {
 
     private String cookTime;
 
+    private String ingredients;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "recipe_steps")
     private Steps steps;
@@ -39,7 +41,7 @@ public class Recipe {
     public Recipe() {
     }
 
-    public Recipe(String recipeName, String description, String category, String thumbnail, String cookTime, Steps steps, Video video, Users user) {
+    public Recipe(String recipeName, String description, String category, String thumbnail, String cookTime, Steps steps, Video video, Users user, String ingredients) {
         this.recipeName = recipeName;
         this.description = description;
         this.category = category;
@@ -48,6 +50,7 @@ public class Recipe {
         this.steps = steps;
         this.video = video;
         this.user = user;
+        this.ingredients = ingredients;
     }
 
     public Users getUser() {
@@ -122,6 +125,14 @@ public class Recipe {
         this.steps = steps;
     }
 
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +
@@ -131,7 +142,7 @@ public class Recipe {
                 ", category='" + category + '\'' +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", cookTime='" + cookTime + '\'' +
-                ", steps=" + steps +
+                ", steps=" + steps +", ingredients="+ ingredients+
                 '}';
     }
 }

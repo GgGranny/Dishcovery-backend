@@ -16,10 +16,12 @@ public class RecipeDto {
 
     private String videoId;
 
+    private String ingredients;
+
     public RecipeDto() {
     }
 
-    public RecipeDto(String recipeName, String description, String category, String thumbnail, String cookTime, String steps, String videoId) {
+    public RecipeDto(String recipeName, String description, String category, String thumbnail, String cookTime, String steps, String videoId, String ingredients) {
         this.recipeName = recipeName;
         this.description = description;
         this.category = category;
@@ -27,6 +29,7 @@ public class RecipeDto {
         this.cookTime = cookTime;
         this.steps = steps;
         this.videoId = videoId;
+        this.ingredients = ingredients;
     }
 
     @Override
@@ -38,6 +41,8 @@ public class RecipeDto {
                 ", thumbnail='" + thumbnail + '\'' +
                 ", cookTime='" + cookTime + '\'' +
                 ", steps='" + steps + '\'' +
+                ", videoId='" + videoId + '\'' +
+                ", ingredients='" + ingredients + '\'' +
                 '}';
     }
 
@@ -45,6 +50,13 @@ public class RecipeDto {
         return videoId;
     }
 
+    public String getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(String ingredients) {
+        this.ingredients = ingredients;
+    }
     public void setVideoId(String videoId) {
         this.videoId = videoId;
     }

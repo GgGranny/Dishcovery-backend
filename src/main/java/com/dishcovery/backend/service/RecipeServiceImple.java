@@ -46,6 +46,7 @@ public class RecipeServiceImple implements RecipeService {
             recipe.setDescription(recipeDto.getDescription());
             recipe.setCookTime(recipeDto.getCookTime());
             recipe.setThumbnail(recipeDto.getThumbnail());
+            recipe.setIngredients(recipeDto.getIngredients());
             if(video != null){
                 recipe.setVideo(video);
             }

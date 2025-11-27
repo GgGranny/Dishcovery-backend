@@ -3,6 +3,7 @@ package com.dishcovery.backend.service;
 
 import com.dishcovery.backend.dto.LoginDto;
 import com.dishcovery.backend.dto.UserDto;
+import com.dishcovery.backend.model.RefreshToken;
 import com.dishcovery.backend.model.Token;
 import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.repo.TokenRepo;
@@ -42,6 +43,9 @@ public class UserServicesImp {
 
     @Autowired
     private JWTService jwtService;
+
+    @Autowired
+    private RefreshTokenImpl refreshTokenService;
 
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     private TokenRepo tokenRepo;
@@ -95,25 +99,26 @@ public class UserServicesImp {
         return false;
     }
 
-    public ResponseEntity<Object> verify(LoginDto userDto) {
+    public  Map<String, String> verify(LoginDto userDto) {
+        Map<String, String> response = new HashMap<>();
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword())
             );
-
             if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(userDto.getUsername());
-                return ResponseEntity.ok(token);
+
+                Users u = userRepo.findByUsername(userDto.getUsername());
+                String refreshToken = refreshTokenService.createRefreshToken(u.getId()).getToken();
+                response.put("token", token);
+                response.put("refreshToken", refreshToken);
+                return response;
             }
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
+        return response;
     }
 
 

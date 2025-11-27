@@ -42,7 +42,8 @@ public class RecipeController {
             @RequestParam(name = "category") String category,
             @RequestParam(name = "recipeThumbnail") MultipartFile recipeThumbnail,
             @RequestParam(name= "cookTime") String cookTime,
-            @RequestParam(name = "steps") String steps
+            @RequestParam(name = "steps") String steps,
+            @RequestParam(name = "ingredients" ) String ingredients
     ) throws IOException {
         Video video = null;
         if(videoFile != null && videoTitle != null && videoDescription != null ) {
@@ -55,6 +56,7 @@ public class RecipeController {
         recipe.setRecipeName(recipeName);
         recipe.setDescription(recipeDescription);
         recipe.setCookTime(cookTime);
+        recipe.setIngredients(ingredients);
 
         byte[] thumbnailArray = recipeThumbnail.getBytes();
         String recipeThumbnailBase64 = Base64.getEncoder().encodeToString(thumbnailArray);
