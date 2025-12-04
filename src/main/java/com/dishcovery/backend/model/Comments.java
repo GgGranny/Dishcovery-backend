@@ -40,9 +40,9 @@ public class Comments {
     @OneToMany(mappedBy = "parentComments", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Comments> replies = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
-//    private List<Likes> likes;
+
+    @OneToMany(mappedBy = "comments", cascade = CascadeType.ALL)
+    private List<Likes> likes;
 
     private int likesCount = 0;
 
@@ -61,7 +61,7 @@ public class Comments {
         this.likesCount = likesCount;
         this.isDeleted = isDeleted;
         this.content = content;
-//        this.likes = likes;
+        this.likes = likes;
     }
 
     public long getId() {
@@ -144,13 +144,13 @@ public class Comments {
         this.parentComments = parentComments;
     }
 
-//    public List<Likes> getLikes() {
-//        return likes;
-//    }
-//
-//    public void setLikes(List<Likes> likes) {
-//        this.likes = likes;
-//    }
+    public List<Likes> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Likes> likes) {
+        this.likes = likes;
+    }
 
     @Override
     public String toString() {

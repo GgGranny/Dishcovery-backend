@@ -20,4 +20,5 @@ public interface CommentsRepo extends JpaRepository<Comments, Long> {
               AND c.isDeleted = false
         """)
     List<Comments> findAllByRecipeAndParentCommentsIsNull(@Param("recipeId") Long recipeId);
+
 }

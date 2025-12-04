@@ -4,16 +4,18 @@ import com.dishcovery.backend.model.enums.LikeTypes;
 
 public class LikesDto {
     private long id;
-    private long recipeId;
+    private long commentId;
     private LikeTypes type;
+    private String username;
 
     public LikesDto() {
     }
 
-    public LikesDto(long id, long recipeId, LikeTypes type) {
+    public LikesDto(long id, long commentId, LikeTypes type, String username) {
         this.id = id;
-        this.recipeId = recipeId;
+        this.commentId = commentId;
         this.type = type;
+        this.username = username;
     }
 
     public long getId() {
@@ -25,11 +27,19 @@ public class LikesDto {
     }
 
     public long getRecipeId() {
-        return recipeId;
+        return commentId;
     }
 
     public void setRecipeId(long recipeId) {
-        this.recipeId = recipeId;
+        this.commentId = recipeId;
+    }
+
+    public long getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(long commentId) {
+        this.commentId = commentId;
     }
 
     public LikeTypes getType() {
@@ -40,11 +50,19 @@ public class LikesDto {
         this.type = type;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public String toString() {
         return "LikesDto{" +
                 "id=" + id +
-                ", recipeId=" + recipeId +
+                ", recipeId=" + commentId +
                 ", type=" + type +
                 '}';
     }

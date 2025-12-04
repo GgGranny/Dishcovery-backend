@@ -36,13 +36,13 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Recipe> recipe;
 
-//    @OneToMany(mappedBy = "", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Likes> likes;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Likes> likes;
 
     public Users() {
     }
 
-    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled, List<Recipe> recipe) {
+    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled, List<Recipe> recipe, List<Likes> likes) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -50,6 +50,7 @@ public class Users {
         this.role = role;
         this.enabled = enabled;
         this.recipe =recipe;
+        this.likes = likes;
     }
 
     public List<Recipe> getRecipe() {
@@ -126,6 +127,14 @@ public class Users {
 
     public void setVideos(List<Video> videos) {
         this.videos = videos;
+    }
+
+    public List<Likes> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Likes> likes) {
+        this.likes = likes;
     }
 
     @Override

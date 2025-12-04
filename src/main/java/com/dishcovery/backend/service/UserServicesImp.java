@@ -6,6 +6,7 @@ import com.dishcovery.backend.dto.UserDto;
 import com.dishcovery.backend.model.RefreshToken;
 import com.dishcovery.backend.model.Token;
 import com.dishcovery.backend.model.Users;
+import com.dishcovery.backend.repo.RefreshTokenRepo;
 import com.dishcovery.backend.repo.TokenRepo;
 import com.dishcovery.backend.repo.UserRepo;
 import com.dishcovery.backend.response.MyResponseHandler;
@@ -49,6 +50,9 @@ public class UserServicesImp {
 
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     private TokenRepo tokenRepo;
+
+    @Autowired
+    private RefreshTokenRepo refreshTokenRepo;
 
     public Map<String, String> registerUser(Users user) {
         Map<String, String>  message = new HashMap<>();
@@ -109,6 +113,12 @@ public class UserServicesImp {
                 String token = jwtService.generateToken(userDto.getUsername());
 
                 Users u = userRepo.findByUsername(userDto.getUsername());
+                RefreshToken oldRefreshToken = refreshTokenRepo.findByUser(u);
+                if(oldRefreshToken != null ) {
+                    response.put("refreshToken", oldRefreshToken.getToken());
+                    response.put("token", token);
+                    return response;
+                }
                 String refreshToken = refreshTokenService.createRefreshToken(u.getId()).getToken();
                 response.put("token", token);
                 response.put("refreshToken", refreshToken);

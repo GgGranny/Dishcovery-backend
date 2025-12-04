@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CommentsTest {
 
 
-    @Autowired
-    private UserSession userSession;
 
     @Test
     public void contextLoads() {
