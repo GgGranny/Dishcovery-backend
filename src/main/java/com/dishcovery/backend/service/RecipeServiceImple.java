@@ -52,7 +52,7 @@ public class RecipeServiceImple implements RecipeService {
             }
 
             // Reformat the steps in list and store in db
-            List<String> stepsList = List.of(recipeDto.getSteps().split("\\r?\\n"));
+            List<String> stepsList = List.of(recipeDto.getSteps().split(","));
             Steps s = stepsRepo.save(new Steps(stepsList));
             recipe.setSteps(s);
 
