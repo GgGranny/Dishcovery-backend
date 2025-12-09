@@ -1,5 +1,6 @@
 package com.dishcovery.backend.service;
 
+import com.dishcovery.backend.components.Pagination;
 import com.dishcovery.backend.dto.RecipeDto;
 import com.dishcovery.backend.interfaces.RecipeService;
 import com.dishcovery.backend.model.Recipe;
@@ -116,6 +117,12 @@ public class RecipeServiceImple implements RecipeService {
 
         // Save updated recipe
         return recipeRepo.save(recipeDb);
+    }
+
+    @Override
+    public List<Recipe> getAllRecipes(int pageNumber, int pageSize) {
+        List<Recipe> recipes = recipeRepo.findAll();
+        return Pagination.paginate(recipes, pageNumber, pageSize);
     }
 
 }

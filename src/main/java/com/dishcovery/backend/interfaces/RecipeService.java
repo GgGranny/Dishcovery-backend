@@ -22,4 +22,7 @@ public interface RecipeService {
 
     // Update a Recipe
     Recipe updateRecipe(RecipeDto recipe, long recipeId);
+
+    // Get All Recipe
+    List<Recipe> getAllRecipes(int pageNumber, int pageSize);
 }

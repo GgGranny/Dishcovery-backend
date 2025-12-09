@@ -119,4 +119,16 @@ public class RecipeController {
         }
         return ResponseEntity.status(HttpStatus.OK).body(r);
     }
+
+    @GetMapping("/recipe")
+    public ResponseEntity<List<Recipe>> getAllRecipes(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
+        List<Recipe> recipes = recipeService.getAllRecipes(page, size);
+        if(recipes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok().body(recipes);
+     }
 }
