@@ -35,7 +35,13 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("register", "login","register/verify-email/**", "api/auth/refresh").permitAll()
+                        .requestMatchers("register",
+                                "login",
+                                "register/verify-email/**",
+                                "api/auth/refresh",
+                                "api/recipes/recipe",
+                                "api/recipes/recipe/r1/**",
+                                "api/v1/videos/stream/segment/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .formLogin(Customizer.withDefaults())
