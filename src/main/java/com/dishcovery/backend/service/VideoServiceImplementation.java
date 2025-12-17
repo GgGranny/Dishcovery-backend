@@ -299,9 +299,9 @@ public class VideoServiceImplementation implements VideoService {
     }
 
     // delete The unsegmented video from the respective folder 360p, 540p, 720p
-    private static void deleteUnsegmentedVideo(String path) throws IOException {
-        Files.delete(Path.of(path));
-    }
+        private static void deleteUnsegmentedVideo(String path) throws IOException {
+            Files.delete(Path.of(path));
+        }
 
 
 
