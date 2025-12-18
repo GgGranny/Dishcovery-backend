@@ -31,6 +31,7 @@ public class Recipe {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="video_id")
+    @JsonIgnore
     private Video video;
 
     @ManyToOne

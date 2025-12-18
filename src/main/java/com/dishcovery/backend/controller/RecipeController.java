@@ -2,8 +2,10 @@ package com.dishcovery.backend.controller;
 
 
 import com.dishcovery.backend.dto.RecipeDto;
+import com.dishcovery.backend.dto.RecipeResponseDto;
 import com.dishcovery.backend.interfaces.RecipeService;
 import com.dishcovery.backend.model.Recipe;
+import com.dishcovery.backend.model.Steps;
 import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.model.Video;
 import com.dishcovery.backend.service.RecipeServiceImple;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -83,12 +86,34 @@ public class RecipeController {
     }
 
     @GetMapping("/recipe/r1/{recipeId}")
-    public ResponseEntity<Recipe> getRecipeByRecipeId(@PathVariable("recipeId") long recipeId) {
+    public ResponseEntity<RecipeResponseDto> getRecipeByRecipeId(@PathVariable("recipeId") long recipeId) {
         Recipe recipe = recipeService.getRecipeById(recipeId);
+        RecipeResponseDto recipeResponseDto = new RecipeResponseDto();
+        recipeResponseDto.setRecipeId(recipe.getRecipeId());
+        recipeResponseDto.setRecipeName(recipe.getRecipeName());
+        recipeResponseDto.setDescription(recipe.getDescription());
+        recipeResponseDto.setCategory(recipe.getCategory());
+        recipeResponseDto.setCookTime(recipe.getCookTime());
+        recipeResponseDto.setIngredients(recipe.getIngredients());
+        if(recipe.getVideo() != null) {
+            recipeResponseDto.setVideoId(recipe.getVideo().getVideoId());
+        }else {
+            recipeResponseDto.setVideoId(null);
+        }
+
+        if(recipe.getSteps() != null ) {
+            List<String> stepsCopy = new ArrayList<>(recipe.getSteps().getSteps());
+            recipeResponseDto.setSteps(stepsCopy);
+        }
+        recipeResponseDto.setThumbnail(recipe.getThumbnail());
+        recipeResponseDto.setUserid(recipe.getUser().getId());
+        recipeResponseDto.setEmail(recipe.getUser().getEmail());
+        recipeResponseDto.setProfilePicture(recipe.getUser().getProfilePicture());
+        recipeResponseDto.setUsername(recipe.getUser().getUsername());
         if(recipe == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return ResponseEntity.ok().body(recipe);
+        return ResponseEntity.ok().body(recipeResponseDto);
     }
 
     @PutMapping("/recipe/r1/update/{recipeId}")
