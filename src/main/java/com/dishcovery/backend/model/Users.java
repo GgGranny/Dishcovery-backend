@@ -1,6 +1,7 @@
 package com.dishcovery.backend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.action.internal.OrphanRemovalAction;
 

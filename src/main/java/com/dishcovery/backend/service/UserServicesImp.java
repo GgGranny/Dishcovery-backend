@@ -117,6 +117,7 @@ public class UserServicesImp {
                 if(oldRefreshToken != null ) {
                     response.put("refreshToken", oldRefreshToken.getToken());
                     response.put("token", token);
+                    response.put("user_id", String.valueOf(u.getId()));
                     return response;
                 }
                 String refreshToken = refreshTokenService.createRefreshToken(u.getId()).getToken();
