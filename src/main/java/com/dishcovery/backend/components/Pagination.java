@@ -16,6 +16,9 @@ public class Pagination {
         if(fromIndex > data.size()) {
             return Collections.emptyList();
         }
+        if(toIndex > data.size()) {
+            toIndex = data.size();
+        }
         return data.subList(fromIndex, toIndex);
     }
 }
