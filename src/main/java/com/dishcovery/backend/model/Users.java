@@ -43,10 +43,16 @@ public class Users {
     @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EsewaPayment> esewaPayment;
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Community> communities;
+
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Chat> chats;
+
     public Users() {
     }
 
-    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled, List<Recipe> recipe, List<Likes> likes) {
+    public Users(String username, String password, String email, String profilePicture, String role, boolean enabled, List<Recipe> recipe, List<Likes> likes, List<Community> communities,List<Chat> chats) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -55,6 +61,8 @@ public class Users {
         this.enabled = enabled;
         this.recipe =recipe;
         this.likes = likes;
+        this.communities = communities;
+        this.chats = chats;
     }
 
     public List<Recipe> getRecipe() {
@@ -139,6 +147,30 @@ public class Users {
 
     public void setLikes(List<Likes> likes) {
         this.likes = likes;
+    }
+
+    public List<Community> getCommunities() {
+        return communities;
+    }
+
+    public void setCommunities(List<Community> communities) {
+        this.communities = communities;
+    }
+
+    public List<EsewaPayment> getEsewaPayment() {
+        return esewaPayment;
+    }
+
+    public void setEsewaPayment(List<EsewaPayment> esewaPayment) {
+        this.esewaPayment = esewaPayment;
+    }
+
+    public List<Chat> getChats() {
+        return chats;
+    }
+
+    public void setChats(List<Chat> chats) {
+        this.chats = chats;
     }
 
     @Override
