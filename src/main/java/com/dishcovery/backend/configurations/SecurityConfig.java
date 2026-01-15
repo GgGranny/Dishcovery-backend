@@ -19,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +42,9 @@ public class SecurityConfig {
                                 "api/auth/refresh",
                                 "api/recipes/recipe",
                                 "api/recipes/recipe/r1/**",
-                                "api/v1/videos/stream/segment/**").permitAll()
+                                "api/v1/videos/stream/segment/**",
+                                "/ws/**",
+                                "/ws/info/**").permitAll()
                         .anyRequest().authenticated()
                 )
 //                .formLogin(Customizer.withDefaults())
@@ -77,6 +80,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
 
 }
