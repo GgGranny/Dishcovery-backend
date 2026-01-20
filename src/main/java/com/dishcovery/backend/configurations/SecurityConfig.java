@@ -47,7 +47,6 @@ public class SecurityConfig {
                                 "/ws/info/**").permitAll()
                         .anyRequest().authenticated()
                 )
-//                .formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session  -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .logout(logout-> logout
