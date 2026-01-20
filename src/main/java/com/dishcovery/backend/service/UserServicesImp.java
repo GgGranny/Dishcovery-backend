@@ -1,8 +1,13 @@
 package com.dishcovery.backend.service;
 
 
+import ch.qos.logback.core.testUtil.RandomUtil;
+import com.dishcovery.backend.components.RecipeComponent;
 import com.dishcovery.backend.dto.LoginDto;
+import com.dishcovery.backend.dto.UserBioDto;
 import com.dishcovery.backend.dto.UserDto;
+import com.dishcovery.backend.dto.UserResponseDto;
+import com.dishcovery.backend.model.Recipe;
 import com.dishcovery.backend.model.RefreshToken;
 import com.dishcovery.backend.model.Token;
 import com.dishcovery.backend.model.Users;
@@ -10,7 +15,11 @@ import com.dishcovery.backend.repo.RefreshTokenRepo;
 import com.dishcovery.backend.repo.TokenRepo;
 import com.dishcovery.backend.repo.UserRepo;
 import com.dishcovery.backend.response.MyResponseHandler;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +28,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServicesImp {
@@ -48,11 +66,25 @@ public class UserServicesImp {
     @Autowired
     private RefreshTokenImpl refreshTokenService;
 
+
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     private TokenRepo tokenRepo;
 
     @Autowired
     private RefreshTokenRepo refreshTokenRepo;
+
+    @Autowired
+    private RecipeComponent recipeComponent;
+
+    @Value("${file.user.profile}")
+    private String profileFolder;
+    @PostConstruct
+    public void init() throws IOException {
+        File file = new File(profileFolder);
+        if(!file.exists()) {
+            Files.createDirectory(Paths.get(profileFolder));
+        }
+    }
 
     public Map<String, String> registerUser(Users user) {
         Map<String, String>  message = new HashMap<>();
@@ -181,4 +213,88 @@ public class UserServicesImp {
         response.put("status", HttpStatus.OK);
         return true;
     }
+
+    public String uploadUserProfile(MultipartFile profile, int userId) throws IOException{
+        if(profile == null ) {
+            throw new NullPointerException("profile is null");
+        }
+        if(!profile.getContentType().startsWith("image/")) {
+            return null;
+        }
+        String randomUUID = UUID.randomUUID().toString();
+        String fileName = profile.getOriginalFilename().trim();
+        fileName = randomUUID.concat(profile.getOriginalFilename());
+        Path path = Paths.get(profileFolder,fileName);
+
+        Users u = userRepo.findById(userId)
+                .orElseThrow(()-> new RuntimeException("user not found for id: "+userId));
+        Path pathToDelete = Path.of(u.getProfilePicture());
+        Files.delete(pathToDelete);
+
+        byte[] bytes = profile.getBytes();
+        InputStream inputStream = profile.getInputStream();
+        Files.copy(inputStream,path, StandardCopyOption.REPLACE_EXISTING);
+        String url = path.toString();
+        u.setProfilePicture(url);
+        userRepo.save(u);
+        return url;
+    }
+
+    public String fetchProfile(int id) throws IOException {
+        Users user = userRepo.findById(id)
+                .orElseThrow(()-> new RuntimeException("no such user found"));
+        String userProfile = user.getProfilePicture();
+        if(userProfile.startsWith("https")) return userProfile;
+        Path path = Paths.get(user.getProfilePicture());
+        Resource resource = new FileSystemResource(path);
+        byte[] bytes = resource.getInputStream().readAllBytes();
+        String profile = Base64.getEncoder().encodeToString(bytes);
+        return profile;
+    }
+
+
+    public UserResponseDto fetchUser(int userId) throws IOException {
+        Users user = userRepo.findById(userId)
+                .orElseThrow(()-> new RuntimeException("User not found for this id"));
+        String profile = fetchProfile(userId);
+        int recipeCount = recipeComponent.countRecipe(userId);
+        UserResponseDto response = new UserResponseDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                profile,
+                user.getRole(),
+                user.getEnabled(),
+                user.getDisplayName(),
+                user.getBio(),
+                recipeCount,
+                user.getFollowersCount() != null ? user.getFollowersCount(): 0,
+                user.getCuisinePreferences()
+        );
+        return response;
+    }
+
+    public Users updateUserBio(UserBioDto userBioDto, int userId) {
+
+        Users user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("No such user found"));
+
+        user.setBio(userBioDto.getBio());
+        user.setDisplayName(userBioDto.getDisplayName());
+
+        // Safe cuisine parsing
+        if (userBioDto.getCuisinePreferences() != null) {
+            List<String> preferredCuisines = Arrays.stream(
+                            userBioDto.getCuisinePreferences().split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .collect(Collectors.toList());
+
+            user.setCuisinePreferences(preferredCuisines);
+        }
+
+        return userRepo.save(user);
+    }
+
 }
+

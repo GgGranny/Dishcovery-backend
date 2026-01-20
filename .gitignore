@@ -37,3 +37,4 @@ src/main/resources/application-local.properties
 /videos/
 /videosHLS/
 /chat_files/
+/profile_pictures/
