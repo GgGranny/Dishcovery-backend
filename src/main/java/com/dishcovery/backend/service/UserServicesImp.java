@@ -228,8 +228,12 @@ public class UserServicesImp {
 
         Users u = userRepo.findById(userId)
                 .orElseThrow(()-> new RuntimeException("user not found for id: "+userId));
+
+        //delete the exisisting path
         Path pathToDelete = Path.of(u.getProfilePicture());
-        Files.delete(pathToDelete);
+        if(pathToDelete.equals(path)){
+            Files.delete(pathToDelete);
+        }
 
         byte[] bytes = profile.getBytes();
         InputStream inputStream = profile.getInputStream();
