@@ -2,6 +2,7 @@ package com.dishcovery.backend.service;
 
 import com.dishcovery.backend.components.Pagination;
 import com.dishcovery.backend.dto.RecipeDto;
+import com.dishcovery.backend.dto.RecipeResponseDto;
 import com.dishcovery.backend.interfaces.RecipeService;
 import com.dishcovery.backend.model.Recipe;
 import com.dishcovery.backend.model.Steps;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeServiceImple implements RecipeService {
@@ -125,4 +127,12 @@ public class RecipeServiceImple implements RecipeService {
         return Pagination.paginate(recipes, pageNumber, pageSize);
     }
 
+    @Override
+    public List<Recipe> fetchSearchResult(String search, int pageNumber, int pageSize) {
+        List<Recipe> recipes = recipeRepo.findAll();
+        List<Recipe> foundRecipes = recipes.stream()
+                .filter(recipe -> recipe.getRecipeName().toLowerCase().contains(search))
+                .toList();
+        return Pagination.paginate(foundRecipes, pageNumber, pageSize);
+    }
 }
