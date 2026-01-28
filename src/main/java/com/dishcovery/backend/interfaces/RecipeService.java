@@ -29,4 +29,6 @@ public interface RecipeService {
     List<Recipe> getAllRecipes(int pageNumber, int pageSize);
 
     List<Recipe> fetchSearchResult(String search, int pageNumber, int pageSize);
+
+    List<Recipe> getRecommendation(Long recipeId);
 }

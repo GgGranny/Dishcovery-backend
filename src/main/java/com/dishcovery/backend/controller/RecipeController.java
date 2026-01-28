@@ -197,4 +197,41 @@ public class RecipeController {
                 .toList();
     return ResponseEntity.status(HttpStatus.OK).body(foundRecipes);
     }
+
+    @GetMapping("/recipe/recommendation")
+    public ResponseEntity<List<RecipeResponseDto>> recommendRecipe(@RequestParam("recipeId") Long recipeId) {
+        List<Recipe> recipes = recipeService.getRecommendation(recipeId);
+        if (recipes.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<RecipeResponseDto> response = recipes.stream()
+                .filter(r -> r.getRecipeId() != recipeId)
+                .map(r -> {
+                    RecipeResponseDto recipeResponseDto = new RecipeResponseDto();
+                    recipeResponseDto.setRecipeId(r.getRecipeId());
+                    recipeResponseDto.setRecipeName(r.getRecipeName());
+                    recipeResponseDto.setDescription(r.getDescription());
+                    recipeResponseDto.setCategory(r.getCategory());
+                    recipeResponseDto.setCookTime(r.getCookTime());
+                    recipeResponseDto.setIngredients(r.getIngredients());
+                    if (r.getVideo() != null) {
+                        recipeResponseDto.setVideoId(r.getVideo().getVideoId());
+                    } else {
+                        recipeResponseDto.setVideoId(null);
+                    }
+
+                    if (r.getSteps() != null) {
+                        List<String> stepsCopy = new ArrayList<>(r.getSteps().getSteps());
+                        recipeResponseDto.setSteps(stepsCopy);
+                    }
+                    recipeResponseDto.setThumbnail(r.getThumbnail());
+                    recipeResponseDto.setUserid(r.getUser().getId());
+                    recipeResponseDto.setEmail(r.getUser().getEmail());
+                    recipeResponseDto.setProfilePicture(r.getUser().getProfilePicture());
+                    recipeResponseDto.setUsername(r.getUser().getUsername());
+                    return recipeResponseDto;
+                })
+                .toList();
+        return ResponseEntity.ok(response);
+    }
 }
