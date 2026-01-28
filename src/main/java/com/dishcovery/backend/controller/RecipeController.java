@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/recipes")
@@ -155,5 +156,82 @@ public class RecipeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         return ResponseEntity.ok().body(recipes);
-     }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<RecipeResponseDto>> searchRecipe(
+            @RequestParam("search") String value,
+            @RequestParam("page") int pageNumber,
+            @RequestParam("size") int pageSize
+    ){
+        String search = value != null ? String.valueOf(value).toLowerCase().trim(): "";
+        int cleanedPageNumber = Math.max(0, Math.round(pageNumber));
+        int cleanedSize = Math.max(1, Math.round(pageSize));
+        List<Recipe> recipes = recipeService.fetchSearchResult(search, cleanedPageNumber, cleanedSize);
+        List<RecipeResponseDto> foundRecipes = recipes.stream()
+                .map(recipe -> {
+                    RecipeResponseDto recipeResponseDto = new RecipeResponseDto();
+                    recipeResponseDto.setRecipeId(recipe.getRecipeId());
+                    recipeResponseDto.setRecipeName(recipe.getRecipeName());
+                    recipeResponseDto.setDescription(recipe.getDescription());
+                    recipeResponseDto.setCategory(recipe.getCategory());
+                    recipeResponseDto.setCookTime(recipe.getCookTime());
+                    recipeResponseDto.setIngredients(recipe.getIngredients());
+                    if(recipe.getVideo() != null) {
+                        recipeResponseDto.setVideoId(recipe.getVideo().getVideoId());
+                    }else {
+                        recipeResponseDto.setVideoId(null);
+                    }
+
+                    if(recipe.getSteps() != null ) {
+                        List<String> stepsCopy = new ArrayList<>(recipe.getSteps().getSteps());
+                        recipeResponseDto.setSteps(stepsCopy);
+                    }
+                    recipeResponseDto.setThumbnail(recipe.getThumbnail());
+                    recipeResponseDto.setUserid(recipe.getUser().getId());
+                    recipeResponseDto.setEmail(recipe.getUser().getEmail());
+                    recipeResponseDto.setProfilePicture(recipe.getUser().getProfilePicture());
+                    recipeResponseDto.setUsername(recipe.getUser().getUsername());
+                    return recipeResponseDto;
+                })
+                .toList();
+    return ResponseEntity.status(HttpStatus.OK).body(foundRecipes);
+    }
+
+    @GetMapping("/recipe/recommendation")
+    public ResponseEntity<List<RecipeResponseDto>> recommendRecipe(@RequestParam("recipeId") Long recipeId) {
+        List<Recipe> recipes = recipeService.getRecommendation(recipeId);
+        if (recipes.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<RecipeResponseDto> response = recipes.stream()
+                .filter(r -> r.getRecipeId() != recipeId)
+                .map(r -> {
+                    RecipeResponseDto recipeResponseDto = new RecipeResponseDto();
+                    recipeResponseDto.setRecipeId(r.getRecipeId());
+                    recipeResponseDto.setRecipeName(r.getRecipeName());
+                    recipeResponseDto.setDescription(r.getDescription());
+                    recipeResponseDto.setCategory(r.getCategory());
+                    recipeResponseDto.setCookTime(r.getCookTime());
+                    recipeResponseDto.setIngredients(r.getIngredients());
+                    if (r.getVideo() != null) {
+                        recipeResponseDto.setVideoId(r.getVideo().getVideoId());
+                    } else {
+                        recipeResponseDto.setVideoId(null);
+                    }
+
+                    if (r.getSteps() != null) {
+                        List<String> stepsCopy = new ArrayList<>(r.getSteps().getSteps());
+                        recipeResponseDto.setSteps(stepsCopy);
+                    }
+                    recipeResponseDto.setThumbnail(r.getThumbnail());
+                    recipeResponseDto.setUserid(r.getUser().getId());
+                    recipeResponseDto.setEmail(r.getUser().getEmail());
+                    recipeResponseDto.setProfilePicture(r.getUser().getProfilePicture());
+                    recipeResponseDto.setUsername(r.getUser().getUsername());
+                    return recipeResponseDto;
+                })
+                .toList();
+        return ResponseEntity.ok(response);
+    }
 }

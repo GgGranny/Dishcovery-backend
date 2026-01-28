@@ -2,6 +2,7 @@ package com.dishcovery.backend.service;
 
 import com.dishcovery.backend.components.Pagination;
 import com.dishcovery.backend.dto.RecipeDto;
+import com.dishcovery.backend.dto.RecipeResponseDto;
 import com.dishcovery.backend.interfaces.RecipeService;
 import com.dishcovery.backend.model.Recipe;
 import com.dishcovery.backend.model.Steps;
@@ -11,14 +12,15 @@ import com.dishcovery.backend.repo.RecipeRepo;
 import com.dishcovery.backend.repo.StepsRepo;
 import com.dishcovery.backend.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeServiceImple implements RecipeService {
@@ -125,4 +127,40 @@ public class RecipeServiceImple implements RecipeService {
         return Pagination.paginate(recipes, pageNumber, pageSize);
     }
 
+    @Override
+    public List<Recipe> fetchSearchResult(String search, int pageNumber, int pageSize) {
+        List<Recipe> recipes = recipeRepo.findAll();
+        List<Recipe> foundRecipes = recipes.stream()
+                .filter(recipe -> recipe.getRecipeName().toLowerCase().contains(search))
+                .toList();
+        return Pagination.paginate(foundRecipes, pageNumber, pageSize);
+    }
+
+    @Override
+    public List<Recipe> getRecommendation(Long recipeId) {
+        if(recipeId == 0) throw new RuntimeException("Recipe id id empty");
+        Recipe recipe = recipeRepo.findByRecipeId(recipeId);
+        List<String> ingredients = List.of(recipe.getIngredients().split(","));
+
+        Map<Recipe, Integer> scores = new HashMap<>();
+        int score = 0;
+        List<Recipe> allRecipes = recipeRepo.findAll();
+        if(allRecipes.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Recipes is empty to recommend");
+        for(Recipe r: allRecipes) {
+            List<String> ingredientsOfEach = List.of(r.getIngredients().split(","));
+            for(String ingredient: ingredients) {
+                if(ingredientsOfEach.contains(ingredient)){
+                    score += 10;
+                }else {
+                    score += -5;
+                }
+            }
+            scores.put(r, score);
+        }
+        return scores.entrySet()
+                .stream()
+                .sorted((a , b) -> b.getValue() - a.getValue())
+                .map(Map.Entry::getKey)
+                .toList();
+    }
 }

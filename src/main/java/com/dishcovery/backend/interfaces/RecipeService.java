@@ -1,8 +1,10 @@
 package com.dishcovery.backend.interfaces;
 
 import com.dishcovery.backend.dto.RecipeDto;
+import com.dishcovery.backend.dto.RecipeResponseDto;
 import com.dishcovery.backend.model.Recipe;
 import com.dishcovery.backend.model.Video;
+import com.dishcovery.backend.repo.RecipeRepo;
 
 import java.util.List;
 
@@ -25,4 +27,8 @@ public interface RecipeService {
 
     // Get All Recipe
     List<Recipe> getAllRecipes(int pageNumber, int pageSize);
+
+    List<Recipe> fetchSearchResult(String search, int pageNumber, int pageSize);
+
+    List<Recipe> getRecommendation(Long recipeId);
 }

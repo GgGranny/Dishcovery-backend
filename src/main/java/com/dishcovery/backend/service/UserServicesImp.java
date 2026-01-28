@@ -230,9 +230,11 @@ public class UserServicesImp {
                 .orElseThrow(()-> new RuntimeException("user not found for id: "+userId));
 
         //delete the exisisting path
-        Path pathToDelete = Path.of(u.getProfilePicture());
-        if(pathToDelete.equals(path)){
-            Files.delete(pathToDelete);
+        if (u.getProfilePicture() != null && !u.getProfilePicture().startsWith("http")) {
+            Path pathToDelete = Paths.get(u.getProfilePicture());
+            if (Files.exists(pathToDelete)) {
+                Files.delete(pathToDelete);
+            }
         }
 
         byte[] bytes = profile.getBytes();
