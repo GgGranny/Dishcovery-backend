@@ -66,6 +66,8 @@ public class UserServicesImp {
     @Autowired
     private RefreshTokenImpl refreshTokenService;
 
+    @Autowired
+    private SubscriptionImple subscriptionImple;
 
     private static final String DEFAULT_PROFILE_IMAGE = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
     private TokenRepo tokenRepo;
@@ -143,8 +145,12 @@ public class UserServicesImp {
             );
             if (authentication.isAuthenticated()) {
                 String token = jwtService.generateToken(userDto.getUsername());
-
                 Users u = userRepo.findByUsername(userDto.getUsername());
+
+                // Subscribe as free user
+                if(!subscriptionImple.isUserSubscribed(u.getId())) {
+                    subscriptionImple.subscribeAsFreeUser(u.getUsername());
+                }
                 RefreshToken oldRefreshToken = refreshTokenRepo.findByUser(u);
                 if(oldRefreshToken != null ) {
                     response.put("refreshToken", oldRefreshToken.getToken());
