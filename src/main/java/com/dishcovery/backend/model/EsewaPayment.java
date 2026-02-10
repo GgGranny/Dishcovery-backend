@@ -3,6 +3,8 @@ package com.dishcovery.backend.model;
 import com.dishcovery.backend.model.enums.PaymentStatus;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 public class EsewaPayment {
     @Id
@@ -13,6 +15,7 @@ public class EsewaPayment {
     private String transaction_code;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
     @Column(name="transactionUuid",unique = true, nullable = false)

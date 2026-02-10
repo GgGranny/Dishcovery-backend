@@ -29,7 +29,7 @@ public class PaymentController {
             @RequestParam(value = "data", required = false) String data
     ) {
         paymentService.verifyPayment(data);
-        return  ResponseEntity.status(HttpStatus.FOUND)
+        return  ResponseEntity.status(HttpStatus.OK)
                 .header("Location", "http://localhost:5173/payment/success")
                 .build();
     }
@@ -40,4 +40,6 @@ public class PaymentController {
                 .header("Location", "http://localhost:5173/payment/fail")
                 .build();
     }
+
+
 }

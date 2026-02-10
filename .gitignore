@@ -38,3 +38,5 @@ src/main/resources/application-local.properties
 /videosHLS/
 /chat_files/
 /profile_pictures/
+/ads/
+hs_err_pid23028.log

@@ -5,13 +5,19 @@ import com.dishcovery.backend.dto.EsewaPaymentDto;
 import com.dishcovery.backend.dto.EsewaSignatureResponseDto;
 import com.dishcovery.backend.interfaces.PaymentService;
 import com.dishcovery.backend.model.EsewaPayment;
+import com.dishcovery.backend.model.Subscription;
 import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.model.enums.PaymentStatus;
+import com.dishcovery.backend.model.enums.SubscriptionStatus;
 import com.dishcovery.backend.repo.PaymentRepo;
+import com.dishcovery.backend.repo.SubscriptionRepo;
 import com.dishcovery.backend.repo.UserRepo;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +28,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.Optional;
 
 
 @Service
@@ -32,11 +40,16 @@ public class PaymentServiceImpl implements PaymentService {
     private final String secretKey = "8gBm/:&EnhH.1/q";
 
     private UserRepo userRepo;
+
     private PaymentRepo paymentRepo;
 
-    public PaymentServiceImpl(UserRepo userRepo, PaymentRepo paymentRepo) {
+    private SubscriptionImple subscriptionImple;
+
+
+    public PaymentServiceImpl(UserRepo userRepo, PaymentRepo paymentRepo, SubscriptionImple subscriptionImple) {
         this.userRepo = userRepo;
         this.paymentRepo = paymentRepo;
+        this.subscriptionImple = subscriptionImple;
     }
     @Override
     public EsewaSignatureResponseDto generateSignature(EsewaPaymentDto dto) {
@@ -86,6 +99,9 @@ public class PaymentServiceImpl implements PaymentService {
             dbPaymentData.setTransaction_code(esewaPaymentSuccess.getTransaction_code());
             if(esewaPaymentSuccess.getStatus().equals("COMPLETE")) {
                 dbPaymentData.setStatus(PaymentStatus.SUCCESS);
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                String username = authentication.getName();
+                subscriptionImple.activateSubscription(username);
             }else {
                 dbPaymentData.setStatus(PaymentStatus.FAILED);
             }
@@ -105,4 +121,35 @@ public class PaymentServiceImpl implements PaymentService {
         EsewaDesearilizeDto esewaPayment = objectMapper.readValue(actualData, EsewaDesearilizeDto.class);
         return esewaPayment;
     }
+
+
+//    private void activateSubscription(String username){
+//        try {
+//             Users user = userRepo.findByUsername(username);
+//             Subscription subscription = subscriptionRepo.findByUser_Id(user.getId());
+//             if(subscription != null){
+//                 subscription.setSubscriptionStatus(SubscriptionStatus.PREMIUM);
+//                 subscription.setActive(true);
+//                 subscription.setStartDate(LocalDateTime.now());
+//                 if(!subscription.getEndData().isBefore(LocalDateTime.now())) {
+//                     subscription.setEndData(subscription.getEndData().plusMinutes(2));
+//                 }else {
+//                     subscription.setEndData(LocalDateTime.now().plusMinutes(2));
+//                 }
+//                 subscriptionRepo.save(subscription);
+//             }else{
+//                 Subscription newSubscription = Subscription.builder()
+//                         .subscriptionStatus(SubscriptionStatus.PREMIUM)
+//                         .startDate(LocalDateTime.now())
+//                         .endData(LocalDateTime.now().plusMinutes(2))
+//                         .isActive(true)
+//                         .user(user)
+//                         .build();
+//                 subscriptionRepo.save(newSubscription);
+//             }
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//    }
+
 }
