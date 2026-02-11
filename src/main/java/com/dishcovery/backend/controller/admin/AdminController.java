@@ -36,8 +36,9 @@ public class AdminController {
         List<UserResponseDto> userResponseDtos = userServicesImp.fetchAllUsers(pageNumber, pageSize);
         return ResponseEntity.ok().body(userResponseDtos);
     }
-    @PatchMapping("/recipe/feature")
-    public ResponseEntity<?> featureRecipes(Long recipeId, @RequestParam("status") boolean status) {
+
+    @PostMapping("/recipe/feature")
+    public ResponseEntity<?> featureRecipes(@RequestParam("recipeId") Long recipeId, @RequestParam("status") boolean status) {
         Recipe recipe  = adminService.featureRecipe(recipeId, status);
         if(recipe != null) {
             return ResponseEntity.ok().body(recipe);
