@@ -36,6 +36,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("register",
                                 "login",
                                 "register/verify-email/**",
@@ -48,7 +49,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session  -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session  -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout-> logout
                         .logoutUrl("/user/logout")
                         .invalidateHttpSession(true)

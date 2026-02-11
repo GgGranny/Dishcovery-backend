@@ -234,4 +234,12 @@ public class RecipeController {
                 .toList();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/recipe/featured-recipes")
+    public ResponseEntity<List<RecipeResponseDto>> featureRecipes(
+            @RequestParam("page") int pageNumber,
+            @RequestParam("size") int pageSize) {
+        List<RecipeResponseDto> responseDtos = recipeService.getFeaturedRecipe(pageNumber, pageSize);
+        return ResponseEntity.ok().body(responseDtos);
+    }
 }
