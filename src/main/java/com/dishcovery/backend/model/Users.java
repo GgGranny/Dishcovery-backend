@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.action.internal.OrphanRemovalAction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -65,7 +66,6 @@ public class Users {
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Chat> chats;
-
 
     public Users() {
     }

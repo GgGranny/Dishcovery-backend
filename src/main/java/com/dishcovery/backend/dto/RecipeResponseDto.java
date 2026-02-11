@@ -26,6 +26,9 @@ public class RecipeResponseDto {
     private String ingredients;
 
     private LocalDateTime createdAt;
+
+    private boolean isFeatured;
+
     //User
     private int userid;
 
@@ -38,7 +41,7 @@ public class RecipeResponseDto {
     public RecipeResponseDto() {
     }
 
-    public RecipeResponseDto(Long recipeId, String recipeName, String description, String category, String thumbnail, String cookTime, List<String> steps, String videoId, String ingredients, int userid, String username, String email, String profilePicture, LocalDateTime createdAt) {
+    public RecipeResponseDto(Long recipeId, String recipeName, String description, String category, String thumbnail, String cookTime, List<String> steps, String videoId, String ingredients, int userid, String username, String email, String profilePicture, LocalDateTime createdAt, boolean isFeatured ) {
         this.recipeId = recipeId;
         this.recipeName = recipeName;
         this.description = description;
@@ -53,6 +56,15 @@ public class RecipeResponseDto {
         this.email = email;
         this.profilePicture = profilePicture;
         this.createdAt = createdAt;
+        this.isFeatured = isFeatured;
+    }
+
+    public boolean isFeatured() {
+        return isFeatured;
+    }
+
+    public void setFeatured(boolean featured) {
+        isFeatured = featured;
     }
 
     public LocalDateTime getCreatedAt() {

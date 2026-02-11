@@ -42,14 +42,14 @@ public class Recipe {
     @JsonIgnore
     private Users user;
 
-    private boolean isFeatured = false;
+    private boolean featured;
 
     private LocalDateTime createAt;
 
     public Recipe() {
     }
 
-    public Recipe(String recipeName, String description, String category, String thumbnail, String cookTime, Steps steps, Video video, Users user, String ingredients, boolean isFeatured, LocalDateTime createAt) {
+    public Recipe(String recipeName, String description, String category, String thumbnail, String cookTime, Steps steps, Video video, Users user, String ingredients, boolean featured, LocalDateTime createAt) {
         this.recipeName = recipeName;
         this.description = description;
         this.category = category;
@@ -59,7 +59,7 @@ public class Recipe {
         this.video = video;
         this.user = user;
         this.ingredients = ingredients;
-        this.isFeatured = isFeatured;
+        this.featured = featured;
         this.createAt = createAt;
     }
 
@@ -152,11 +152,11 @@ public class Recipe {
     }
 
     public boolean isFeatured() {
-        return isFeatured;
+        return featured;
     }
 
     public void setFeatured(boolean featured) {
-        isFeatured = featured;
+        this.featured = featured;
     }
 
     @Override
