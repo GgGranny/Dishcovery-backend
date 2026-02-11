@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 "/ws/info/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session  -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout-> logout
                         .logoutUrl("/user/logout")
