@@ -145,8 +145,8 @@ public class UserServicesImp {
                     new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword())
             );
             if (authentication.isAuthenticated()) {
-                String token = jwtService.generateToken(userDto.getUsername());
                 Users u = userRepo.findByUsername(userDto.getUsername());
+                String token = jwtService.generateToken(u.getUsername(), u.getRole());
 
                 // Subscribe as free user
                 if(!subscriptionImple.isUserSubscribed(u.getId())) {
@@ -156,12 +156,15 @@ public class UserServicesImp {
                 if(oldRefreshToken != null ) {
                     response.put("refreshToken", oldRefreshToken.getToken());
                     response.put("token", token);
+                    response.put("role", u.getRole());
                     response.put("user_id", String.valueOf(u.getId()));
                     return response;
                 }
                 String refreshToken = refreshTokenService.createRefreshToken(u.getId()).getToken();
-                response.put("token", token);
                 response.put("refreshToken", refreshToken);
+                response.put("token", token);
+                response.put("role", u.getRole());
+                response.put("user_id", String.valueOf(u.getId()));
                 return response;
             }
 

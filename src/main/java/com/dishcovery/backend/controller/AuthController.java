@@ -2,6 +2,7 @@ package com.dishcovery.backend.controller;
 
 
 import com.dishcovery.backend.interfaces.RefreshTokenService;
+import com.dishcovery.backend.model.Users;
 import com.dishcovery.backend.repo.RefreshTokenRepo;
 import com.dishcovery.backend.service.JWTService;
 import com.dishcovery.backend.service.RefreshTokenImpl;
@@ -33,7 +34,7 @@ public class AuthController {
                         refreshTokenRepo.delete(t);
                         return ResponseEntity.badRequest().body("Refresh Token Expired. Please Login Again");
                     }
-                    String newJwt = jwtService.generateToken(t.getUser().getUsername());
+                    String newJwt = jwtService.generateToken(t.getUser().getUsername(), t.getUser().getRole());
                     return ResponseEntity.ok().body(Map.of("token", newJwt));
                 })
                 .orElse(ResponseEntity.badRequest().body("Invalid Refresh Token"));
