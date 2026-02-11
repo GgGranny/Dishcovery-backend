@@ -163,4 +163,36 @@ public class RecipeServiceImple implements RecipeService {
                 .map(Map.Entry::getKey)
                 .toList();
     }
+
+
+    public List<RecipeResponseDto> getFeaturedRecipe(int pageNumber, int pageSize){
+        List<Recipe> recipes = recipeRepo.findAllByIsFeatured();
+        List<RecipeResponseDto> featuredRecipes = new ArrayList<>();
+        for(Recipe recipe : recipes) {
+            RecipeResponseDto recipeResponseDto = new RecipeResponseDto();
+            recipeResponseDto.setRecipeId(recipe.getRecipeId());
+            recipeResponseDto.setRecipeName(recipe.getRecipeName());
+            recipeResponseDto.setDescription(recipe.getDescription());
+            recipeResponseDto.setCategory(recipe.getCategory());
+            recipeResponseDto.setCookTime(recipe.getCookTime());
+            recipeResponseDto.setIngredients(recipe.getIngredients());
+            if(recipe.getVideo() != null) {
+                recipeResponseDto.setVideoId(recipe.getVideo().getVideoId());
+            }else {
+                recipeResponseDto.setVideoId(null);
+            }
+
+            if(recipe.getSteps() != null ) {
+                List<String> stepsCopy = new ArrayList<>(recipe.getSteps().getSteps());
+                recipeResponseDto.setSteps(stepsCopy);
+            }
+            recipeResponseDto.setThumbnail(recipe.getThumbnail());
+            recipeResponseDto.setUserid(recipe.getUser().getId());
+            recipeResponseDto.setEmail(recipe.getUser().getEmail());
+            recipeResponseDto.setProfilePicture(recipe.getUser().getProfilePicture());
+            recipeResponseDto.setUsername(recipe.getUser().getUsername());
+            featuredRecipes.add(recipeResponseDto);
+        }
+        return Pagination.paginate(featuredRecipes, pageNumber, pageSize);
+    }
 }

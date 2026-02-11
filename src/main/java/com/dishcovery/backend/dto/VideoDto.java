@@ -11,7 +11,6 @@ public class VideoDto {
 
     private String description;
 
-
     private String path;
 
     private String contentType;

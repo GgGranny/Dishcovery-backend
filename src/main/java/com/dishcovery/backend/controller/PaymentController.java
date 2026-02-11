@@ -29,14 +29,14 @@ public class PaymentController {
             @RequestParam(value = "data", required = false) String data
     ) {
         paymentService.verifyPayment(data);
-        return  ResponseEntity.status(HttpStatus.OK)
+        return  ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", "http://localhost:5173/payment/success")
                 .build();
     }
 
     @GetMapping("/esewa/payment-failed")
     public ResponseEntity<?> esewaPaymentFailed() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.FOUND)
                 .header("Location", "http://localhost:5173/payment/fail")
                 .build();
     }

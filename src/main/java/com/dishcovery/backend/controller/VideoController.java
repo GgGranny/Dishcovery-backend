@@ -133,7 +133,6 @@ public class VideoController {
             byte[] data = new byte[(int) contentLength];
             int read = inputStream.read(data, 0 , data.length);
 
-
             return ResponseEntity
                     .status(HttpStatus.PARTIAL_CONTENT)
                     .contentType(MediaType.parseMediaType(contentType))
