@@ -24,6 +24,6 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
 
     Recipe findByRecipeId(long recipeId);
 
-    @Query("SELECT r  FROM Recipe r WHERE r.isFeatured = true")
+    @Query("SELECT r  FROM Recipe r WHERE r.featured = true")
     List<Recipe> findAllByIsFeatured();
 }

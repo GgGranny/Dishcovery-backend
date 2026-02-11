@@ -52,6 +52,7 @@ public class RecipeServiceImple implements RecipeService {
             recipe.setThumbnail(recipeDto.getThumbnail());
             recipe.setIngredients(recipeDto.getIngredients());
             recipe.setCreateAt(LocalDateTime.now());
+            recipe.setFeatured(false);
             if(video != null){
                 recipe.setVideo(video);
             }
@@ -179,6 +180,7 @@ public class RecipeServiceImple implements RecipeService {
             recipeResponseDto.setCookTime(recipe.getCookTime());
             recipeResponseDto.setIngredients(recipe.getIngredients());
             recipeResponseDto.setCreatedAt(recipe.getCreateAt());
+            recipeResponseDto.setFeatured(recipeResponseDto.isFeatured());
 
             if(recipe.getVideo() != null) {
                 recipeResponseDto.setVideoId(recipe.getVideo().getVideoId());
