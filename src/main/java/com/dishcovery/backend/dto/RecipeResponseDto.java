@@ -2,6 +2,7 @@ package com.dishcovery.backend.dto;
 
 import jakarta.persistence.Column;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RecipeResponseDto {
@@ -24,6 +25,7 @@ public class RecipeResponseDto {
 
     private String ingredients;
 
+    private LocalDateTime createdAt;
     //User
     private int userid;
 
@@ -36,7 +38,7 @@ public class RecipeResponseDto {
     public RecipeResponseDto() {
     }
 
-    public RecipeResponseDto(Long recipeId, String recipeName, String description, String category, String thumbnail, String cookTime, List<String> steps, String videoId, String ingredients, int userid, String username, String email, String profilePicture) {
+    public RecipeResponseDto(Long recipeId, String recipeName, String description, String category, String thumbnail, String cookTime, List<String> steps, String videoId, String ingredients, int userid, String username, String email, String profilePicture, LocalDateTime createdAt) {
         this.recipeId = recipeId;
         this.recipeName = recipeName;
         this.description = description;
@@ -50,6 +52,15 @@ public class RecipeResponseDto {
         this.username = username;
         this.email = email;
         this.profilePicture = profilePicture;
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getRecipeId() {

@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +51,7 @@ public class RecipeServiceImple implements RecipeService {
             recipe.setCookTime(recipeDto.getCookTime());
             recipe.setThumbnail(recipeDto.getThumbnail());
             recipe.setIngredients(recipeDto.getIngredients());
+            recipe.setCreateAt(LocalDateTime.now());
             if(video != null){
                 recipe.setVideo(video);
             }
@@ -176,6 +178,8 @@ public class RecipeServiceImple implements RecipeService {
             recipeResponseDto.setCategory(recipe.getCategory());
             recipeResponseDto.setCookTime(recipe.getCookTime());
             recipeResponseDto.setIngredients(recipe.getIngredients());
+            recipeResponseDto.setCreatedAt(recipe.getCreateAt());
+
             if(recipe.getVideo() != null) {
                 recipeResponseDto.setVideoId(recipe.getVideo().getVideoId());
             }else {

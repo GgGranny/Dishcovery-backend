@@ -1,5 +1,8 @@
 package com.dishcovery.backend.dto;
 
+import java.time.LocalDateTime;
+
+
 public class RecipeDto {
 
     private String recipeName;
@@ -18,10 +21,12 @@ public class RecipeDto {
 
     private String ingredients;
 
+    private LocalDateTime createdAt;
+
     public RecipeDto() {
     }
 
-    public RecipeDto(String recipeName, String description, String category, String thumbnail, String cookTime, String steps, String videoId, String ingredients) {
+    public RecipeDto(String recipeName, String description, String category, String thumbnail, String cookTime, String steps, String videoId, String ingredients, LocalDateTime createdAt) {
         this.recipeName = recipeName;
         this.description = description;
         this.category = category;
@@ -30,6 +35,7 @@ public class RecipeDto {
         this.steps = steps;
         this.videoId = videoId;
         this.ingredients = ingredients;
+        this.createdAt = createdAt;
     }
 
     @Override
@@ -44,6 +50,14 @@ public class RecipeDto {
                 ", videoId='" + videoId + '\'' +
                 ", ingredients='" + ingredients + '\'' +
                 '}';
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getVideoId() {

@@ -7,6 +7,7 @@ import com.dishcovery.backend.service.RecipeServiceImple;
 import com.dishcovery.backend.service.UserServicesImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +26,7 @@ public class AdminController {
     @Autowired
     private UserServicesImp userServicesImp;
 
-    @RequestMapping("/fect-users")
+    @GetMapping("/fetch-users")
     public ResponseEntity<List<UserResponseDto>> fetchAllUsers(
             @RequestParam("page") int pageNumber,
             @RequestParam("size") int pageSize
