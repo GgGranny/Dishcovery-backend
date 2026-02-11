@@ -23,4 +23,7 @@ public interface RecipeRepo extends JpaRepository<Recipe, Long> {
     Recipe findByVideoVideoId(String videoId);
 
     Recipe findByRecipeId(long recipeId);
+
+    @Query("SELECT r  FROM Recipe r WHERE r.isFeatured = true")
+    List<Recipe> findAllByIsFeatured();
 }

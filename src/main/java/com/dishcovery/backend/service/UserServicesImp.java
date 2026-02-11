@@ -2,6 +2,7 @@ package com.dishcovery.backend.service;
 
 
 import ch.qos.logback.core.testUtil.RandomUtil;
+import com.dishcovery.backend.components.Pagination;
 import com.dishcovery.backend.components.RecipeComponent;
 import com.dishcovery.backend.dto.LoginDto;
 import com.dishcovery.backend.dto.UserBioDto;
@@ -263,8 +264,6 @@ public class UserServicesImp {
         String profile = Base64.getEncoder().encodeToString(bytes);
         return profile;
     }
-
-
     public UserResponseDto fetchUser(int userId) throws IOException {
         Users user = userRepo.findById(userId)
                 .orElseThrow(()-> new RuntimeException("User not found for this id"));
@@ -306,6 +305,30 @@ public class UserServicesImp {
         }
 
         return userRepo.save(user);
+    }
+
+    public List<UserResponseDto> fetchAllUsers(int pageNumber, int pageSize) throws IOException {
+        List<Users> users = userRepo.findAllByEnabled();
+        List<UserResponseDto>  userResponseDtos = new ArrayList<>();
+        for(Users user: users) {
+            String profile = fetchProfile(user.getId());
+            int recipeCount = recipeComponent.countRecipe(user.getId());
+            UserResponseDto response = new UserResponseDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    profile,
+                    user.getRole(),
+                    user.getEnabled(),
+                    user.getDisplayName(),
+                    user.getBio(),
+                    recipeCount,
+                    user.getFollowersCount() != null ? user.getFollowersCount(): 0,
+                    user.getCuisinePreferences()
+            );
+            userResponseDtos.add(response);
+        }
+        return Pagination.paginate(userResponseDtos, pageNumber, pageSize);
     }
 
 }
